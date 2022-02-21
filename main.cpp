@@ -11,8 +11,12 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <fstream>
+#include <thread>
+#include <vector>
 
 #define PORT 8080
+
+using namespace std;
 int main()
 {
 	int server_fd, new_socket, valread;
@@ -21,7 +25,10 @@ int main()
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
     char* content = "Hello world!";
+    int pool_count = 5;
+    vector<thread> threads;
 
+ 
     // Creating socket file descriptor
     /*int sockfd = socket(domain, type, protocol)
     
@@ -51,18 +58,34 @@ int main()
     // prepare for connections on socket
     listen(server_fd, 3);
 
-    // wait for connection and open a new socket when it arrives
-    new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+  
+    for (int i = 0; i < pool_count; i++) {
+        // wait for connection and open a new socket when it arrives
+        new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
 
-
-    //block of code to act as a wait function
-    unsigned long temp = 0;
-    for(unsigned long i = 0; i < 18446744073709551610; i++){
-        temp = temp + 1;
+        //create new thread using lambda expresion
+        threads.push_back(
+            thread([new_socket,content] {
+                //block of code to act as a wait function
+                unsigned long temp = 0;
+                for(unsigned long i = 0; i < 18446744073709551610; i++){
+                    temp = temp + 1;
+                }
+        
+                //send content to client
+                send(new_socket , content , strlen(content) , 0 );
+            })
+        );
     }
-    
-    send(new_socket , content , strlen(content) , 0 );
-    
+
+    //join threads after they complete
+    for (thread &t : threads) {
+        if (t.joinable()) {
+            t.join();
+        }
+    }
+
+
 
 	return 0;
 }
