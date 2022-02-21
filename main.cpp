@@ -1,7 +1,7 @@
 // Server side C/C++ program to demonstrate Socket programming
 // This is only set to work with IPV4 and TCP
-// Build and run. go to browser and type localhost:8080/'filename'.extension' to see message
-// or use  curl -X GET "localhost:8080/'filename'.'extension'"
+// Build and run. 
+// use curl -X GET "localhost:8080"
 // review socket.h for function usage
 
 #include <unistd.h>
@@ -9,7 +9,9 @@
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
-#include <string.h>
+#include <string.h>  
+#include <time.h>      
+
 #include <fstream>
 #include <thread>
 #include <vector>
@@ -24,10 +26,10 @@ int main()
     int opt = 1;
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
-    char* content = "Hello world!";
-    int pool_count = 5;
+    char* content = "Hello world!\n";
     vector<thread> threads;
-
+    srand (time(NULL));
+    
  
     // Creating socket file descriptor
     /*int sockfd = socket(domain, type, protocol)
@@ -58,30 +60,30 @@ int main()
     // prepare for connections on socket
     listen(server_fd, 3);
 
-  
-    for (int i = 0; i < pool_count; i++) {
+    
+    while(true){
+       
         // wait for connection and open a new socket when it arrives
         new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
 
+       
         //create new thread using lambda expresion
         threads.push_back(
-            thread([new_socket,content] {
+            thread([&new_socket, &content] {
                 //block of code to act as a wait function
                 unsigned long temp = 0;
-                for(unsigned long i = 0; i < 18446744073709551610; i++){
+                for(unsigned long i = 0; i < 1709551610; i++){
                     temp = temp + 1;
                 }
-        
-                //send content to client
+            
                 send(new_socket , content , strlen(content) , 0 );
             })
         );
-    }
 
-    //join threads after they complete
-    for (thread &t : threads) {
-        if (t.joinable()) {
-            t.join();
+        for (std::thread &t : threads) {
+            if (t.joinable()) {
+                t.join();
+            }
         }
     }
 
