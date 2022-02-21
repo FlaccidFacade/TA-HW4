@@ -20,13 +20,7 @@ int main()
     int opt = 1;
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
-
-    char *token;
-
-    std::ifstream input;
-    //define buffer for file content
-    const int CONT_SIZE = 1024;
-    char* content = new char [CONT_SIZE];
+    char* content = "Hello world!";
 
     // Creating socket file descriptor
     /*int sockfd = socket(domain, type, protocol)
@@ -59,33 +53,16 @@ int main()
 
     // wait for connection and open a new socket when it arrives
     new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
-	valread = read( new_socket , buffer, 1024);
-    //read() returns -1 for errors and 0 for EOF
-    if(valread == -1){
-        printf("ERROR when reading new_socket\n");
-        return -1;
-    }else if (valread == 0){
-        printf("End-Of-File");
-        return -2;
-    }else{
-        //get the type of request
-        token = strtok(buffer, " ");
-       
-        //get the path for request
-        token = strtok(NULL, " ");
 
-        //remove "/"
-        token++;
 
-        //open requested file
-        input.open(token);
-
-        //read into buffer
-        input.read(content, CONT_SIZE);
-
-        //send buffer content to client
-        send(new_socket , content , strlen(content) , 0 );
+    //block of code to act as a wait function
+    unsigned long temp = 0;
+    for(unsigned long i = 0; i < 18446744073709551610; i++){
+        temp = temp + 1;
     }
+    
+    send(new_socket , content , strlen(content) , 0 );
+    
 
 	return 0;
 }
